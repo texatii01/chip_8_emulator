@@ -16,10 +16,16 @@ or close the window to quit.
 
 ## ROM selection
 
-No ROM is included with the emulator. Provide your own ROM to run.
+No ROM is included with the emulator. Provide your own ROM to run. When you
+start the emulator without a command-line argument, the launcher opens with
+the executable's directory. Click a folder to browse into it, select a ROM,
+then click **Launch**. The parent-directory button and mouse wheel help you
+navigate; the arrow keys move the selection, **Enter** opens a folder or
+launches the selected ROM, and **Backspace** moves to the parent folder. Only
+`.ch8`, `.chip8`, `.c8`, and `.rom` files are shown.
 
-By default, the emulator looks for `pong.ch8` beside its executable. Provide a
-ROM path as the first command-line argument to select a different game:
+If `pong.ch8` is beside the executable, it is preselected. To skip the launcher,
+pass a ROM path as the first command-line argument:
 
 ```sh
 ./build/chip_8_emulator path/to/game.ch8
@@ -27,6 +33,13 @@ ROM path as the first command-line argument to select a different game:
 
 The argument can be an absolute path or a path relative to the current working
 directory.
+
+## Pixel color
+
+Choose one of the ten color swatches in the launcher or set a custom color
+using the red, green, and blue sliders. The preview shows the selected color.
+The chosen color applies to all lit pixels for that run; the background stays
+dark.
 
 ## Emulator behavior
 

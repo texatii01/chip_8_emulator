@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(chip_8_emulator VERSION 1.0.1 LANGUAGES CXX)
+project(chip_8_emulator VERSION 1.1.0 LANGUAGES CXX)
 
 find_package(SDL2 CONFIG REQUIRED)
 
-add_executable(chip_8_emulator main.cpp)
+add_executable(chip_8_emulator main.cpp launcher_ui.cpp)
 target_compile_features(chip_8_emulator PRIVATE cxx_std_17)
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/pong.ch8")

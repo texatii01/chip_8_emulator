@@ -1,0 +1,52 @@
+name: Windows release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag to package (for example, v1.1.0)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    name: Package Windows x64
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - name: Configure
+        shell: pwsh
+        run: >-
+          cmake -S . -B build
+          -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+          -DVCPKG_TARGET_TRIPLET=x64-windows-static
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $packageDirectory = "package/chip_8_emulator-windows-x64"
+          New-Item -ItemType Directory -Path $packageDirectory -Force | Out-Null
+          Copy-Item "build/Release/chip_8_emulator.exe" $packageDirectory
+          Copy-Item "README.md", "LICENSE" $packageDirectory
+          Compress-Archive -Path "$packageDirectory/*" -DestinationPath "chip_8_emulator-windows-x64.zip"
+
+      - name: Publish release asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag || github.ref_name }}
+          files: chip_8_emulator-windows-x64.zip
+          fail_on_unmatched_files: true
+          generate_release_notes: true

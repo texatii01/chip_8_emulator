@@ -152,6 +152,10 @@
 
   <ItemGroup>
     <ClCompile Include="..\main.cpp" />
+    <ClCompile Include="..\launcher_ui.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\launcher_ui.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

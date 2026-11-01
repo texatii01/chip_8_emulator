@@ -10,6 +10,8 @@
 
 #include <SDL.h>
 
+#include "launcher_ui.h"
+
 namespace {
 
 constexpr std::size_t kMemorySize = 0x1000;
@@ -27,6 +29,8 @@ constexpr std::size_t kBcdDigitCount = 3;
 constexpr uint8_t kDecimalBase = 10;
 constexpr uint8_t kHundredsPlace = 100;
 constexpr int kWindowScale = 12;
+constexpr int kLauncherWindowWidth = 1000;
+constexpr int kLauncherWindowHeight = 700;
 constexpr double kInstructionsPerSecond = 700.0;
 constexpr double kTimerUpdatesPerSecond = 60.0;
 constexpr int kAudioSampleRate = 44100;
@@ -34,7 +38,6 @@ constexpr int kAudioToneFrequency = 440;
 constexpr std::size_t kAudioFramesPerChunk = kAudioSampleRate / 30;
 constexpr std::size_t kMaximumQueuedAudioFrames = kAudioSampleRate / 10;
 constexpr int16_t kAudioAmplitude = 6000;
-constexpr char kRomFileName[] = "pong.ch8";
 
 } // namespace
 
@@ -91,10 +94,9 @@ public:
     }
     sdl_initialized_ = true;
 
-    window_ = SDL_CreateWindow(
-        "CHIP-8 Emulator - Pong", SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED, static_cast<int>(kScreenWidth) * kWindowScale,
-        static_cast<int>(kScreenHeight) * kWindowScale, SDL_WINDOW_RESIZABLE);
+    window_ = SDL_CreateWindow("CHIP-8 Emulator", SDL_WINDOWPOS_CENTERED,
+                               SDL_WINDOWPOS_CENTERED, kLauncherWindowWidth,
+                               kLauncherWindowHeight, SDL_WINDOW_RESIZABLE);
     if (window_ == nullptr) {
       std::cerr << "Error: Could not create the SDL window: " << SDL_GetError()
                 << std::endl;
@@ -141,6 +143,24 @@ public:
     return true;
   }
 
+  SDL_Renderer *renderer() const { return renderer_; }
+
+  SDL_Window *window() const { return window_; }
+
+  bool prepare_game_display() const {
+    if (SDL_RenderSetLogicalSize(renderer_, static_cast<int>(kScreenWidth),
+                                 static_cast<int>(kScreenHeight)) != 0) {
+      std::cerr << "Error: Could not configure the emulator display: "
+                << SDL_GetError() << std::endl;
+      return false;
+    }
+
+    SDL_SetWindowSize(window_, static_cast<int>(kScreenWidth) * kWindowScale,
+                      static_cast<int>(kScreenHeight) * kWindowScale);
+    SDL_SetWindowTitle(window_, "CHIP-8 Emulator");
+    return true;
+  }
+
   // Returns false when the user closes the window or presses Escape.
   bool poll_events(MemoryBus &memory_bus) const {
     SDL_Event event;
@@ -181,7 +201,7 @@ public:
   }
 
   // Draws each lit CHIP-8 pixel into the scaled, logical-size SDL window.
-  bool render(const MemoryBus &memory_bus) const {
+  bool render(const MemoryBus &memory_bus, SDL_Color pixel_color) const {
     if (SDL_SetRenderDrawColor(renderer_, 12, 16, 20, 255) != 0 ||
         SDL_RenderClear(renderer_) != 0) {
       std::cerr << "Error: Could not clear the SDL display: " << SDL_GetError()
@@ -189,7 +209,8 @@ public:
       return false;
     }
 
-    if (SDL_SetRenderDrawColor(renderer_, 120, 255, 150, 255) != 0) {
+    if (SDL_SetRenderDrawColor(renderer_, pixel_color.r, pixel_color.g,
+                               pixel_color.b, pixel_color.a) != 0) {
       std::cerr << "Error: Could not set the SDL pixel color: "
                 << SDL_GetError() << std::endl;
       return false;
@@ -765,22 +786,23 @@ int main(int argument_count, char *arguments[]) {
     return 1;
   }
 
+  SDL_Color pixel_color = {120, 255, 150, 255};
   std::string rom_file_path;
   if (argument_count == 2) {
     rom_file_path = arguments[1];
   } else {
-    // Find the bundled ROM next to the executable, independent of the
-    // directory from which the user launched the emulator.
-    char *executable_directory = SDL_GetBasePath();
-    if (executable_directory == nullptr) {
-      std::cerr << "Error: Could not determine the executable directory: "
-                << SDL_GetError() << std::endl;
+    const LauncherResult launcher_result = run_launcher(
+        frontend.renderer(), frontend.window(), rom_file_path, pixel_color);
+    if (launcher_result == LauncherResult::quit) {
+      return 0;
+    }
+    if (launcher_result == LauncherResult::error) {
       return 1;
     }
+  }
 
-    rom_file_path = executable_directory;
-    rom_file_path += kRomFileName;
-    SDL_free(executable_directory);
+  if (!frontend.prepare_game_display()) {
+    return 1;
   }
 
   if (!load_rom(memory_bus, rom_file_path)) {
@@ -839,7 +861,7 @@ int main(int argument_count, char *arguments[]) {
       return 1;
     }
 
-    if (!frontend.render(memory_bus)) {
+    if (!frontend.render(memory_bus, pixel_color)) {
       return 1;
     }
     frontend.wait_for_next_frame();
