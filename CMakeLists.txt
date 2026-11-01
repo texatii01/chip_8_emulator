@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(chip_8_emulator LANGUAGES CXX)
+project(chip_8_emulator VERSION 1.0.0 LANGUAGES CXX)
 
 find_package(SDL2 CONFIG REQUIRED)
 
