@@ -16,6 +16,8 @@ or close the window to quit.
 
 ## ROM selection
 
+No ROM is included with the emulator. Provide your own ROM to run.
+
 By default, the emulator looks for `pong.ch8` beside its executable. Provide a
 ROM path as the first command-line argument to select a different game:
 

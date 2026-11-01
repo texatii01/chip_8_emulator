@@ -3,7 +3,7 @@
 A CHIP-8 interpreter with an SDL2 window, keyboard input, and sound-timer
 beep. The emulator targets the original 64 × 32 CHIP-8 display.
 
-The current stable release is **1.0.0**.
+The current stable release is **1.0.1**.
 
 ## Requirements
 
@@ -27,30 +27,35 @@ From the repository root on macOS or Linux:
 ```sh
 cmake -S . -B build
 cmake --build build
-./build/chip_8_emulator
+./build/chip_8_emulator path/to/rom.ch8
 ```
+
+Replace `path/to/rom.ch8` with the path to a CHIP-8 ROM file you provide.
+The emulator does not include a ROM.
 
 On Windows, open `chip_8_emulator.slnx` in Visual Studio and build the
 `chip_8_emulator` project. Visual Studio restores SDL2 from `vcpkg.json`.
+Run the resulting executable with a ROM path as its first argument.
 
 To build with CMake on Windows, configure with the vcpkg toolchain:
 
 ```powershell
 cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
 cmake --build build --config Release
-.\build\Release\chip_8_emulator.exe
+.\build\Release\chip_8_emulator.exe path\to\rom.ch8
 ```
 
-On macOS, the included VS Code configuration is available through **Run and
-Debug**: select **Run CHIP-8 emulator** and start debugging. Its build task
-uses CMake and LLDB. On Windows, use the Visual Studio solution or configure
-VS Code's CMake task with the vcpkg toolchain.
+On macOS, select **Run CHIP-8 emulator** in VS Code's **Run and Debug** view.
+The configuration prompts for a ROM path; its build task uses CMake and LLDB.
+On Windows, use the Visual Studio solution or configure VS Code's CMake task
+with the vcpkg toolchain.
 
 ## ROMs
 
-When `pong.ch8` is present in the repository root, the build copies it beside
-the executable and the emulator loads it by default. To run another ROM, pass
-its path as the first argument:
+The emulator requires a ROM, but no ROM is included in this repository. By
+default, it looks for `pong.ch8` beside the executable. If you provide that
+file in the repository root before building, the build copies it beside the
+executable. Otherwise, pass a ROM path as the first argument:
 
 ```sh
 ./build/chip_8_emulator path/to/rom.ch8
@@ -60,3 +65,7 @@ The ROM must be no larger than the available CHIP-8 program memory. ROM files
 are not required to build the emulator.
 
 See [USER_GUIDE.md](USER_GUIDE.md) for controls and implementation notes.
+
+## License
+
+This project is distributed under the [MIT License](LICENSE).

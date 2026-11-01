@@ -6,13 +6,21 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/build/chip_8_emulator",
-      "args": [],
+      "args": ["${input:romPath}"],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}/build",
       "environment": [],
       "externalConsole": false,
       "MIMode": "lldb",
       "preLaunchTask": "Build CHIP-8 emulator"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "romPath",
+      "type": "promptString",
+      "description": "Path to a CHIP-8 ROM",
+      "default": "pong.ch8"
     }
   ]
 }
