@@ -7,6 +7,11 @@ find_package(SDL2 CONFIG REQUIRED)
 add_executable(chip_8_emulator main.cpp launcher_ui.cpp)
 target_compile_features(chip_8_emulator PRIVATE cxx_std_17)
 
+if(MSVC)
+    set_property(TARGET chip_8_emulator PROPERTY
+                 MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/pong.ch8")
     add_custom_command(
         TARGET chip_8_emulator POST_BUILD

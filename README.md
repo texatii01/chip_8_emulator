@@ -3,7 +3,7 @@
 A CHIP-8 interpreter with an SDL2 window, keyboard input, and sound-timer
 beep. The emulator targets the original 64 × 32 CHIP-8 display.
 
-The current stable release is **1.1.0**.
+The current stable release is **1.1.1**.
 
 ## Requirements
 
